@@ -6,7 +6,7 @@ on:
       - main  # 或者其他你希望触发的分支
   schedule:
     - cron: '0 * * * *'  # 每小时运行一次，调整为你需要的时间间隔
-  workflow_dispatch:  # 添加这个部分，允许手动触发
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   download_and_extract:
@@ -27,3 +27,16 @@ jobs:
         tar -xzf subs-check.tar.gz
         # 查看解压后的文件结构
         ls -l
+
+    - name: Commit and push subs-check to repository
+      run: |
+        # 添加解压后的文件
+        git add ./subs-check
+        git add ./config/config.yaml  # 如果配置文件也需要上传
+        # 提交文件
+        git commit -m "Add subs-check binary"
+        # 将变动推送到 GitHub 仓库
+        git push origin main  # 推送到 main 分支，你可以根据需要改成其他分支
+      env:
+        # 设置 GitHub 的身份信息
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub Actions 自动生成的 GITHUB_TOKEN 来执行 push 操作
