@@ -3,10 +3,10 @@ name: Run subs-check and update all.yaml
 on:
   push:
     branches:
-      - main              # 推送到 main 时触发
+      - main              # 推送到 main 时触发，可以改成你用的分支
   schedule:
     - cron: '0 */2 * * *' # 每 2 小时运行一次
-  workflow_dispatch:      # 允许手动运行
+  workflow_dispatch:      # 支持在 Actions 页面手动运行
 
 jobs:
   run-subs-check:
@@ -16,13 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Show workspace and files (debug)
-        run: |
-          echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
-          echo "Current dir: $(pwd)"
-          echo "List current directory:"
-          ls -R
+        with:
+          fetch-depth: 0  # 方便后面做 diff 判断有没有变化
 
       - name: Make subs-check executable
         run: |
@@ -33,30 +28,14 @@ jobs:
           # 前台运行，日志会直接显示在 Actions 日志里
           ./subs-check -f ./config.yaml
 
-      - name: Check and copy generated all.yaml
+      - name: Copy generated all.yaml from ./output to repo root
         run: |
-          # 这里用绝对路径和相对路径都检查一遍，防止目录不一致
-          ABS_PATH="$GITHUB_WORKSPACE/output/all.yaml"
-          REL_PATH="./output/all.yaml"
-
-          echo "Checking for all.yaml at:"
-          echo "  $ABS_PATH"
-          echo "  $REL_PATH"
-
-          if [ -f "$ABS_PATH" ]; then
-            echo "Found all.yaml at ABS_PATH, copying to repo root ./all.yaml"
-            cp "$ABS_PATH" "$GITHUB_WORKSPACE/all.yaml"
-          elif [ -f "$REL_PATH" ]; then
-            echo "Found all.yaml at REL_PATH, copying to repo root ./all.yaml"
-            cp "$REL_PATH" ./all.yaml
+          if [ -f ./output/all.yaml ]; then
+            echo "Found ./output/all.yaml, copying to ./all.yaml"
+            cp ./output/all.yaml ./all.yaml
           else
-            echo "all.yaml not found in expected locations. Listing output directory:"
-            ls -R "$GITHUB_WORKSPACE"
-            exit 0
+            echo "No ./output/all.yaml found, nothing to copy."
           fi
-
-          echo "Final all.yaml location:"
-          ls -l all.yaml
 
       - name: Commit and push all.yaml if changed
         env:
@@ -70,8 +49,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 如果 all.yaml 没变化就不提交，避免刷 commit
-          if git diff --quiet all.yaml; then
+          # 对比当前工作区和上一次提交的 all.yaml，没变化就不提交
+          if git diff --quiet HEAD -- all.yaml; then
             echo "all.yaml has no changes; nothing to commit."
             exit 0
           fi
