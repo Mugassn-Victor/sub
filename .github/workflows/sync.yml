@@ -23,7 +23,7 @@ jobs:
         echo "The server architecture is: $ARCHITECTURE" > architecture.txt
     
     - name: Upload architecture.txt
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # 更新为 v3 版本
       with:
         name: architecture-output
         path: architecture.txt  # 将 architecture.txt 上传为 artifact，方便后续下载查看
