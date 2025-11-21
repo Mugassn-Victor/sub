@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # 保证获取所有历史记录，便于推送更改
 
       - name: Make subs-check executable
         run: |
@@ -44,16 +44,24 @@ jobs:
           echo "Stopping subs-check (PID $SUBS_PID)"
           kill $SUBS_PID || echo "subs-check already stopped"
 
-      - name: Commit & push if changed
+      - name: Commit & push all.yaml if changed
         run: |
-          if [ -n "$(git status --porcelain)" ]; then
+          # 检查 all.yaml 是否有变化
+          if [ -n "$(git diff --stat all.yaml)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .
+            
+            # 用 GITHUB_TOKEN 进行身份验证
+            git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
+            # 添加 all.yaml 文件
+            git add all.yaml
+
+            # 提交并推送
             git commit -m "Update all.yaml from subs-check"
-            git push
+            git push origin HEAD:main
           else
-            echo "No changes to commit."
+            echo "No changes to all.yaml, skipping commit."
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
