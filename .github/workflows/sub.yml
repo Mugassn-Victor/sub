@@ -23,19 +23,26 @@ jobs:
         run: |
           chmod +x ./subs-check
 
-      - name: Run subs-check
+      - name: Run subs-check and monitor output
         run: |
-          # 前台运行，日志会直接显示在 Actions 日志里
-          ./subs-check -f ./config.yaml
+          # 启动 subs-check 前台运行
+          ./subs-check -f ./config.yaml &
+          
+          # 获取 subs-check 进程的 PID
+          SUBS_PID=$!
 
-      - name: Copy generated all.yaml from ./output to repo root
-        run: |
-          if [ -f ./output/all.yaml ]; then
-            echo "Found ./output/all.yaml, copying to ./all.yaml"
-            cp ./output/all.yaml ./all.yaml
-          else
-            echo "No ./output/all.yaml found, nothing to copy."
-          fi
+          # 等待 output/all.yaml 文件生成
+          while [ ! -f ./output/all.yaml ]; do
+            sleep 10  # 每 10 秒检查一次
+          done
+          echo "Found ./output/all.yaml, copying to ./all.yaml"
+          
+          # 复制生成的 all.yaml 到仓库根目录
+          cp ./output/all.yaml ./all.yaml
+
+          # 终止 subs-check 程序
+          echo "Stopping subs-check (PID $SUBS_PID)"
+          kill $SUBS_PID
 
       - name: Commit and push all.yaml if changed
         env:
