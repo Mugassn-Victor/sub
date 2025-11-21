@@ -1,75 +1,28 @@
-name: Detect environment and download subs-check
+name: Download and Extract subs-check
 
 on:
   push:
     branches:
-      - main  # 或者你希望触发的其他分支
+      - main  # 或者其他你希望触发的分支
   schedule:
-    - cron: '0 * * * *'  # 每小时执行一次，可以调整为你需要的频率
+    - cron: '0 * * * *'  # 每小时运行一次，调整为你需要的时间间隔
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # 你可以根据需要更改为 macos-latest 或 windows-latest
+  download_and_extract:
+    runs-on: ubuntu-latest  # 选择 Linux 系统作为 runner
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # 获取代码仓库内容
-
-    - name: Detect environment (OS and Architecture)
-      id: detect
+      uses: actions/checkout@v2  # 检出当前仓库代码
+    
+    - name: Download subs-check release
       run: |
-        # 检查操作系统和架构
-        OS=$(uname -s)
-        ARCH=$(uname -m)
+        # 下载 subs-check Linux 版本二进制文件
+        curl -L https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Linux_x86_64.tar.gz -o subs-check.tar.gz
         
-        echo "Operating System: $OS"
-        echo "Architecture: $ARCH"
-        
-        # 设置下载的二进制文件版本和URL
-        if [[ "$OS" == "Linux" ]]; then
-          if [[ "$ARCH" == "x86_64" ]]; then
-            echo "Selected: Linux x86_64"
-            echo "DOWNLOAD_URL=https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Linux_x86_64.tar.gz" >> $GITHUB_ENV
-          elif [[ "$ARCH" == "i386" ]]; then
-            echo "Selected: Linux i386"
-            echo "DOWNLOAD_URL=https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Linux_i386.tar.gz" >> $GITHUB_ENV
-          else
-            echo "Unsupported architecture: $ARCH"
-            exit 1
-          fi
-        elif [[ "$OS" == "Darwin" ]]; then
-          if [[ "$ARCH" == "x86_64" ]]; then
-            echo "Selected: macOS x86_64"
-            echo "DOWNLOAD_URL=https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Darwin_x86_64.tar.gz" >> $GITHUB_ENV
-          elif [[ "$ARCH" == "arm64" ]]; then
-            echo "Selected: macOS arm64"
-            echo "DOWNLOAD_URL=https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Darwin_aarch64.tar.gz" >> $GITHUB_ENV
-          else
-            echo "Unsupported architecture: $ARCH"
-            exit 1
-          fi
-        elif [[ "$OS" == "MINGW"* ]]; then  # Windows环境
-          echo "Selected: Windows x86_64"
-          echo "DOWNLOAD_URL=https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Windows_x86_64.zip" >> $GITHUB_ENV
-        else
-          echo "Unsupported OS: $OS"
-          exit 1
-        fi
-
-    - name: Download subs-check
+    - name: Extract subs-check
       run: |
-        # 获取下载链接
-        echo "Downloading from: $DOWNLOAD_URL"
-        
-        # 下载并解压相应的 subs-check 版本
-        curl -L $DOWNLOAD_URL -o subs-check.tar.gz
-        mkdir -p ./bin
-        tar -xzf subs-check.tar.gz -C ./bin
-        ls -al ./bin  # 列出解压后的文件
-
-    - name: Run subs-check
-      run: |
-        # 给二进制文件添加执行权限
-        chmod +x ./bin/subs-check
-        # 假设你已经有 config.yaml 文件
-        ./bin/subs-check -f ./config/config.yaml
+        # 解压文件
+        tar -xzf subs-check.tar.gz
+        # 查看解压后的文件结构
+        ls -l
