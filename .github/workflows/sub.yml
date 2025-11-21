@@ -8,6 +8,9 @@ on:
     - cron: '0 */2 * * *' # 每 2 小时运行一次
   workflow_dispatch:      # 支持在 Actions 页面手动运行
 
+permissions:
+  contents: write         # 确保 GitHub Actions 有权限推送内容到仓库
+
 jobs:
   run-subs-check:
     runs-on: ubuntu-latest
@@ -18,7 +21,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false   # 我们自己配置 git 凭据
 
       - name: Make subs-check executable
         run: |
@@ -45,7 +47,6 @@ jobs:
       - name: Commit and push all.yaml (always overwrite)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPO: ${{ github.repository }}   # 例如 user/sub
         run: |
           if [ ! -f ./all.yaml ]; then
             echo "all.yaml not found in repo root, nothing to commit."
