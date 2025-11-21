@@ -33,3 +33,13 @@ URL: http://127.0.0.1:8199/sub/ACL4SSR_Online_Full.yaml
 [sub-store] INFO: statusCode: 200
 [sub-store] INFO: Pre-processor [Clash Pre-processor] activated
 [sub-store] INFO: Clash Parser is activated
+[sub-store] ERROR: UUID may be invalid: 🇳🇱NL_12|2.0MB/s id8567660651
+[sub-store] ERROR: UUID may be invalid: 🇳🇱NL_12|2.0MB/s id8567660651
+[sub-store] INFO: 正在下载订阅：sub
+请求 User-Agent: Go-http-client/1.1
+请求 target: V2Ray
+实际输出: V2Ray
+[sub-store] INFO: Pre-processor [Clash Pre-processor] activated
+[sub-store] INFO: Clash Parser is activated
+[sub-store] ERROR: UUID may be invalid: 🇳🇱NL_12|2.0MB/s id8567660651
+[sub-store] ERROR: UUID may be invalid: 🇳🇱NL_12|2.0MB/s id8567660651
