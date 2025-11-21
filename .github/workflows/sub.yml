@@ -23,7 +23,13 @@ jobs:
 
     - name: Run subs-check
       run: |
-        nohup ./subs-check -f ./config.yaml &  # 启动 subs-check 程序并在后台运行
+        # 启动 subs-check 程序，并将输出重定向到 output.log 文件
+        nohup ./subs-check -f ./config.yaml > output.log 2>&1 &  # 将 stdout 和 stderr 重定向到 output.log 文件
+
+    - name: Show the logs of subs-check
+      run: |
+        # 实时查看 output.log 文件的内容
+        tail -f output.log  # 显示日志内容
 
     - name: Wait for subs-check to generate all.yaml
       run: |
