@@ -46,16 +46,16 @@ jobs:
 
       - name: Commit & push all.yaml if changed
         run: |
-          # 检查 all.yaml 是否有变化
-          if [ -n "$(git diff --stat all.yaml)" ]; then
+          # 确保 all.yaml 被添加到 git 跟踪
+          git add all.yaml
+          
+          # 检查是否有变化
+          if [ -n "$(git status --porcelain)" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             
             # 用 GITHUB_TOKEN 进行身份验证
             git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
-
-            # 添加 all.yaml 文件
-            git add all.yaml
 
             # 提交并推送
             git commit -m "Update all.yaml from subs-check"
