@@ -1,4 +1,4 @@
-name: Run subs-check and update all.yaml
+name: Run subs-check and update all.yaml and sub-store.log
 
 on:
   push:
@@ -26,28 +26,29 @@ jobs:
         run: |
           chmod +x ./subs-check
 
-      - name: Run subs-check and wait for all.yaml
+      - name: Run subs-check and wait for all.yaml and sub-store.log
         run: |
           # 后台启动 subs-check
           ./subs-check -f ./config.yaml &
           SUBS_PID=$!
 
-          # 等待 output/all.yaml 出现
-          while [ ! -f ./output/all.yaml ]; do
-            echo "waiting for ./output/all.yaml ..."
+          # 等待 output/all.yaml 和 output/sub-store.log 文件出现
+          while [ ! -f ./output/all.yaml ] || [ ! -f ./output/sub-store.log ]; do
+            echo "waiting for all.yaml and sub-store.log ..."
             sleep 10
           done
 
-          echo "Found ./output/all.yaml, copying to ./all.yaml"
+          echo "Found all.yaml and sub-store.log, copying to root directory"
           cp ./output/all.yaml ./all.yaml
+          cp ./output/sub-store.log ./sub-store.log
 
           echo "Stopping subs-check (PID $SUBS_PID)"
           kill $SUBS_PID || echo "subs-check already stopped"
 
-      - name: Commit & push all.yaml if changed
+      - name: Commit & push all.yaml and sub-store.log if changed
         run: |
-          # 确保 all.yaml 被添加到 git 跟踪
-          git add all.yaml
+          # 确保 all.yaml 和 sub-store.log 被添加到 git 跟踪
+          git add all.yaml sub-store.log
           
           # 检查是否有变化
           if [ -n "$(git status --porcelain)" ]; then
@@ -58,10 +59,10 @@ jobs:
             git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
 
             # 提交并推送
-            git commit -m "Update all.yaml from subs-check"
+            git commit -m "Update all.yaml and sub-store.log from subs-check"
             git push origin HEAD:main
           else
-            echo "No changes to all.yaml, skipping commit."
+            echo "No changes to all.yaml or sub-store.log, skipping commit."
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
