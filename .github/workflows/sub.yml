@@ -3,7 +3,7 @@ name: Run subs-check and update all.yaml
 on:
   push:
     branches:
-      - main              # 推送到 main 时触发，可以改成你用的分支
+      - main              # 确认你的分支名就是 main
   schedule:
     - cron: '0 */2 * * *' # 每 2 小时运行一次
   workflow_dispatch:      # 支持在 Actions 页面手动运行
@@ -17,36 +17,35 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 方便后面做 diff 判断有没有变化
+          fetch-depth: 0
+          persist-credentials: false   # 我们自己配置 git 凭据
 
       - name: Make subs-check executable
         run: |
           chmod +x ./subs-check
 
-      - name: Run subs-check and monitor output
+      - name: Run subs-check and wait for all.yaml
         run: |
-          # 启动 subs-check 前台运行
+          # 后台启动 subs-check
           ./subs-check -f ./config.yaml &
-          
-          # 获取 subs-check 进程的 PID
           SUBS_PID=$!
 
-          # 等待 output/all.yaml 文件生成
+          # 等待 output/all.yaml 出现
           while [ ! -f ./output/all.yaml ]; do
-            sleep 10  # 每 10 秒检查一次
+            echo "waiting for ./output/all.yaml ..."
+            sleep 10
           done
+
           echo "Found ./output/all.yaml, copying to ./all.yaml"
-          
-          # 复制生成的 all.yaml 到仓库根目录
           cp ./output/all.yaml ./all.yaml
 
-          # 终止 subs-check 程序
           echo "Stopping subs-check (PID $SUBS_PID)"
-          kill $SUBS_PID
+          kill $SUBS_PID || echo "subs-check already stopped"
 
-      - name: Commit and push all.yaml if changed
+      - name: Commit and push all.yaml (always overwrite)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}   # 例如 user/sub
         run: |
           if [ ! -f ./all.yaml ]; then
             echo "all.yaml not found in repo root, nothing to commit."
@@ -56,12 +55,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 对比当前工作区和上一次提交的 all.yaml，没变化就不提交
-          if git diff --quiet HEAD -- all.yaml; then
-            echo "all.yaml has no changes; nothing to commit."
-            exit 0
-          fi
+          # 用 token 重写 origin，确保有权限 push
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
 
+          echo "Current git status:"
+          git status
+
+          # 无脑 add，没变化 git commit 自己会说 nothing to commit
           git add all.yaml
-          git commit -m "Update all.yaml from subs-check"
-          git push
+
+          if git commit -m "Update all.yaml from subs-check"; then
+            echo "Commit created, pushing to main..."
+            git push origin HEAD:main
+          else
+            echo "No changes to commit，跳过 push。"
+          fi
