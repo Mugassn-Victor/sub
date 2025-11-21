@@ -3,51 +3,74 @@ name: Run subs-check and update all.yaml
 on:
   push:
     branches:
-      - main          # 推送到 main 时触发
+      - main              # 推送到 main 时触发
   schedule:
-    - cron: '0 */2 * * *'  # 每 2 小时运行一次
-  workflow_dispatch:        # 允许手动运行
+    - cron: '0 */2 * * *' # 每 2 小时运行一次
+  workflow_dispatch:      # 允许手动运行
 
 jobs:
   run-subs-check:
     runs-on: ubuntu-latest
-    timeout-minutes: 120    # 单次最多跑 2 小时
+    timeout-minutes: 120  # 单次最多跑 2 小时
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4   # 检出代码
+        uses: actions/checkout@v4
+
+      - name: Show workspace and files (debug)
+        run: |
+          echo "GITHUB_WORKSPACE = $GITHUB_WORKSPACE"
+          echo "Current dir: $(pwd)"
+          echo "List current directory:"
+          ls -R
 
       - name: Make subs-check executable
         run: |
-          chmod +x ./subs-check     # 仓库根目录里的二进制
+          chmod +x ./subs-check
 
       - name: Run subs-check
         run: |
-          # 前台运行，日志会直接显示在 Actions 页面
+          # 前台运行，日志会直接显示在 Actions 日志里
           ./subs-check -f ./config.yaml
 
-      - name: Copy generated all.yaml to repo root
+      - name: Check and copy generated all.yaml
         run: |
-          if [ -f ./output/all.yaml ]; then
-            echo "Found ./output/all.yaml, copying to ./all.yaml"
-            cp ./output/all.yaml ./all.yaml
+          # 这里用绝对路径和相对路径都检查一遍，防止目录不一致
+          ABS_PATH="$GITHUB_WORKSPACE/output/all.yaml"
+          REL_PATH="./output/all.yaml"
+
+          echo "Checking for all.yaml at:"
+          echo "  $ABS_PATH"
+          echo "  $REL_PATH"
+
+          if [ -f "$ABS_PATH" ]; then
+            echo "Found all.yaml at ABS_PATH, copying to repo root ./all.yaml"
+            cp "$ABS_PATH" "$GITHUB_WORKSPACE/all.yaml"
+          elif [ -f "$REL_PATH" ]; then
+            echo "Found all.yaml at REL_PATH, copying to repo root ./all.yaml"
+            cp "$REL_PATH" ./all.yaml
           else
-            echo "No ./output/all.yaml found, nothing to copy."
+            echo "all.yaml not found in expected locations. Listing output directory:"
+            ls -R "$GITHUB_WORKSPACE"
+            exit 0
           fi
+
+          echo "Final all.yaml location:"
+          ls -l all.yaml
 
       - name: Commit and push all.yaml if changed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ ! -f ./all.yaml ]; then
-            echo "all.yaml not found, nothing to commit."
+            echo "all.yaml not found in repo root, nothing to commit."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 如果 all.yaml 没有变化就不提交，避免刷 commit
+          # 如果 all.yaml 没变化就不提交，避免刷 commit
           if git diff --quiet all.yaml; then
             echo "all.yaml has no changes; nothing to commit."
             exit 0
