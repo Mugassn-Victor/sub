@@ -6,6 +6,7 @@ on:
       - main  # 或者其他你希望触发的分支
   schedule:
     - cron: '0 * * * *'  # 每小时运行一次，调整为你需要的时间间隔
+  workflow_dispatch:  # 添加这个部分，允许手动触发
 
 jobs:
   download_and_extract:
