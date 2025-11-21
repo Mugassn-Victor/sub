@@ -28,6 +28,11 @@ jobs:
         # 查看解压后的文件结构
         ls -l
 
+    - name: Set up Git user
+      run: |
+        git config --global user.name "Mugasn-Victor"  # 使用你提供的用户名
+        git config --global user.email "1530195945@qq.com"  # 使用你提供的邮箱
+
     - name: Commit and push subs-check to repository
       run: |
         # 添加解压后的文件
