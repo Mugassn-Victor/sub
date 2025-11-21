@@ -44,30 +44,16 @@ jobs:
           echo "Stopping subs-check (PID $SUBS_PID)"
           kill $SUBS_PID || echo "subs-check already stopped"
 
-      - name: Commit and push all.yaml (always overwrite)
+      - name: Commit & push if changed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Update all.yaml from subs-check"
+            git push
+          else
+            echo "No changes to commit."
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if [ ! -f ./all.yaml ]; then
-            echo "all.yaml not found in repo root, nothing to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # 用 token 重写 origin，确保有权限 push
-          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git"
-
-          echo "Current git status:"
-          git status
-
-          # 无脑 add，没变化 git commit 自己会说 nothing to commit
-          git add all.yaml
-
-          if git commit -m "Update all.yaml from subs-check"; then
-            echo "Commit created, pushing to main..."
-            git push origin HEAD:main
-          else
-            echo "No changes to commit，跳过 push。"
-          fi
