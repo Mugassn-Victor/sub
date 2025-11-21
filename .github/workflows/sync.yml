@@ -1,47 +1,29 @@
-name: Download and Extract subs-check
+name: Check Server Architecture
 
 on:
   push:
     branches:
-      - main  # 或者其他你希望触发的分支
-  schedule:
-    - cron: '0 * * * *'  # 每小时运行一次，调整为你需要的时间间隔
-  workflow_dispatch:  # 允许手动触发
+      - main  # 或者你需要触发的分支
+  workflow_dispatch:  # 允许手动触发工作流
 
 jobs:
-  download_and_extract:
-    runs-on: ubuntu-latest  # 选择 Linux 系统作为 runner
+  check-architecture:
+    runs-on: ubuntu-latest  # 使用 GitHub 提供的 Ubuntu runner
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # 检出当前仓库代码
+      uses: actions/checkout@v2  # 检出代码库，默认会下载你的所有文件（如果你有其他文件的话）
+
+    - name: Get server architecture
+      run: |
+        # 使用 uname -m 或 arch 命令来获取架构信息
+        ARCHITECTURE=$(uname -m)
+        echo "The server architecture is: $ARCHITECTURE"  # 输出到控制台
+        # 将架构信息写入 architecture.txt 文件
+        echo "The server architecture is: $ARCHITECTURE" > architecture.txt
     
-    - name: Download subs-check release
-      run: |
-        # 下载 subs-check Linux 版本二进制文件
-        curl -L https://github.com/beck-8/subs-check/releases/download/v1.4.4/subs-check_Linux_x86_64.tar.gz -o subs-check.tar.gz
-        
-    - name: Extract subs-check
-      run: |
-        # 解压文件
-        tar -xzf subs-check.tar.gz
-        # 查看解压后的文件结构
-        ls -l
-
-    - name: Set up Git user
-      run: |
-        git config --global user.name "Mugasn-Victor"  # 使用你提供的用户名
-        git config --global user.email "1530195945@qq.com"  # 使用你提供的邮箱
-
-    - name: Commit and push subs-check to repository
-      run: |
-        # 添加解压后的文件
-        git add ./subs-check
-        git add ./config/config.yaml  # 如果配置文件也需要上传
-        # 提交文件
-        git commit -m "Add subs-check binary"
-        # 将变动推送到 GitHub 仓库
-        git push origin main  # 推送到 main 分支，你可以根据需要改成其他分支
-      env:
-        # 设置 GitHub 的身份信息
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub Actions 自动生成的 GITHUB_TOKEN 来执行 push 操作
+    - name: Upload architecture.txt
+      uses: actions/upload-artifact@v2
+      with:
+        name: architecture-output
+        path: architecture.txt  # 将 architecture.txt 上传为 artifact，方便后续下载查看
