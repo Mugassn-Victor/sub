@@ -33,17 +33,37 @@ URL: http://127.0.0.1:8199/sub/ACL4SSR_Online_Full.yaml
 [sub-store] INFO: statusCode: 200
 [sub-store] INFO: Pre-processor [Clash Pre-processor] activated
 [sub-store] INFO: Clash Parser is activated
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_18|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_20|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_18|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_20|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_14|8.6MB/s TelPJ38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_22|3.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_17|7.5MB/s TelPJ37
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_25|5.1MB/s id5111554007
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_27|5.7MB/s Parsashonam-Bot-38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_29|5.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇭🇰HK_9|740KB/s vpn
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_14|8.6MB/s TelPJ38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_22|3.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_17|7.5MB/s TelPJ37
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_25|5.1MB/s id5111554007
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_27|5.7MB/s Parsashonam-Bot-38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_29|5.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇭🇰HK_9|740KB/s vpn
 [sub-store] INFO: 正在下载订阅：sub
 请求 User-Agent: Go-http-client/1.1
 请求 target: V2Ray
 实际输出: V2Ray
 [sub-store] INFO: Pre-processor [Clash Pre-processor] activated
 [sub-store] INFO: Clash Parser is activated
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_18|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_20|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_18|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
-[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_20|4.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_14|8.6MB/s TelPJ38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_22|3.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_17|7.5MB/s TelPJ37
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_25|5.1MB/s id5111554007
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_27|5.7MB/s Parsashonam-Bot-38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_29|5.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇭🇰HK_9|740KB/s vpn
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_14|8.6MB/s TelPJ38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_22|3.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇫🇷FR_17|7.5MB/s TelPJ37
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_25|5.1MB/s id5111554007
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_27|5.7MB/s Parsashonam-Bot-38
+[sub-store] ERROR: UUID may be invalid: 🇩🇪DE_29|5.4MB/s Warpi-Free-Vpn-In-GooglePlay
+[sub-store] ERROR: UUID may be invalid: 🇭🇰HK_9|740KB/s vpn
